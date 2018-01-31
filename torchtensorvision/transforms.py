@@ -37,6 +37,7 @@ class RandomHorizontalFlip(object):
 	def __init__(self,shape,seed=1):
 		self.aux=torch.cuda.LongTensor(list(reversed(range(shape))))
 		self.shape=shape
+		global seed_flag
 		if not seed_flag:
 			random.seed(a=seed)
 			seed_flag=True
@@ -50,6 +51,7 @@ class RandomHorizontalFlip(object):
 class RandomCrop(object):
 	'''Cropping a value. Only square supported'''
 	def __init__(self,cropsize,seed=1):
+		global seed_flag
 		self.shape=cropsize
 		if not seed_flag:
 			random.seed(a=seed)
