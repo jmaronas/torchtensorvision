@@ -2,6 +2,9 @@ import torch
 import Functional as F
 import numpy
 import random
+
+seed_flag=0
+
 class Compose(object):
     """Composes several transforms together.
 
@@ -31,9 +34,13 @@ class ToGPU(object):
 
 class RandomHorizontalFlip(object):
 	''' Horizontal fliping'''
-	def __init__(self,shape):
+	def __init__(self,shape,seed=1):
 		self.aux=torch.cuda.LongTensor(list(reversed(range(shape))))
 		self.shape=shape
+		if not seed_flag:
+			random.seed(a=seed)
+			seed_flag=True
+
 	def __call__(self,img):
 		assert self.shape==img.shape[-1]
 		if random.random()<0.5:
@@ -42,8 +49,11 @@ class RandomHorizontalFlip(object):
 
 class RandomCrop(object):
 	'''Cropping a value. Only square supported'''
-	def __init__(self,cropsize):
+	def __init__(self,cropsize,seed=1):
 		self.shape=cropsize
+		if not seed_flag:
+			random.seed(a=seed)
+			seed_flag=True
 
 	def get_shapes(self,img):
 		_,w, h = img.shape
