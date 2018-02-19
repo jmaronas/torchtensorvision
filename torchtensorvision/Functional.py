@@ -6,5 +6,5 @@ def hflip(img,aux):
 def Crop(img,i,j,th,tw):
 	return img[:,i:i+th,j:j+tw]
 
-def Zscore(img,mean,std)
+def Zscore(img,mean,std):
 		return (img-mean)/std
