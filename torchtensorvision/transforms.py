@@ -86,5 +86,11 @@ class CentralCrop(object):
 		i,j,th,tw=self.get_shapes(img)
 		return F.Crop(img,i,j,th,tw)	
 
-
+class Zscore(object):
+	'''0-mean 1-std normalization'''
+	def __call__(self,img,mean=[0,0,0],std=[1,1,1]):
+		for c in len(img.shape):
+			img[c]=F.Zscore(img[c],mean[c],std[c])
+		return img
+		
 
