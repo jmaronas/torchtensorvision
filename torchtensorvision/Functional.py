@@ -15,10 +15,9 @@ def Zscore(img,mean,std):
 def rotate(img,angle):#unsupported the rest of torchvision options
 	if img.is_cuda:
 		img=img.cpu()
-	img.numpy()
-
+	img=img.numpy()
 	img=numpy.transpose(img,(1,2,0))
-	img=imrotate(img,angle,mode='symmetric')
+	img=imrotate(img,numpy.float32(angle),mode='symmetric').astype(numpy.float32)
 	img=numpy.transpose(img,(2,0,1))
 	return torch.from_numpy(img)
 	
