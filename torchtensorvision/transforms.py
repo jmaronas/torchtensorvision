@@ -2,8 +2,10 @@ import torch
 import Functional as F
 import numpy
 import random
+import numbers
 
 seed_flag=0
+generator=0
 
 class Compose(object):
     """Composes several transforms together.
@@ -38,8 +40,10 @@ class RandomHorizontalFlip(object):
 		self.aux=torch.cuda.LongTensor(list(reversed(range(shape))))
 		self.shape=shape
 		global seed_flag
+		global generator
 		if not seed_flag:
 			random.seed(a=seed)
+			generator=numpy.random.RandomState(seed=seed)
 			seed_flag=True
 
 	def __call__(self,img):
@@ -52,9 +56,11 @@ class RandomCrop(object):
 	'''Cropping a value. Only square supported'''
 	def __init__(self,cropsize,seed=1):
 		global seed_flag
+		global generator
 		self.shape=cropsize
 		if not seed_flag:
 			random.seed(a=seed)
+			generator=numpy.random.RandomState(seed=seed)
 			seed_flag=True
 
 	def get_shapes(self,img):
@@ -93,4 +99,50 @@ class Zscore(object):
 			img[c]=F.Zscore(img[c],mean[c],std[c])
 		return img
 		
+class RandomRotation(object):
 
+    def __init__(self, degrees,seed=1, resample=False, expand=False, center=None):
+	global seed_flag
+	global generator
+        if not seed_flag:
+		seed_flag=True
+		generator=numpy.random.RandomState(seed=seed)
+		
+
+        if isinstance(degrees, numbers.Number):
+            if degrees < 0:
+                raise ValueError("If degrees is a single number, it must be positive.")
+            self.degrees = (-degrees, degrees)
+        else:
+            if len(degrees) != 2:
+                raise ValueError("If degrees is a sequence, it must be of len 2.")
+            self.degrees = degrees
+
+        self.resample = resample
+        self.expand = expand
+        self.center = center
+
+    @staticmethod
+    def get_params(degrees):
+        """Get parameters for ``rotate`` for a random rotation.
+        Returns:
+            sequence: params to be passed to ``rotate`` for random rotation.
+        """
+        angle = generator.uniform(degrees[0], degrees[1])
+
+        return angle
+
+    def __call__(self, img):
+
+        angle = self.get_params(self.degrees)
+
+        return F.rotate(img, angle)
+
+    def __repr__(self):
+        format_string = self.__class__.__name__ + '(degrees={0}'.format(self.degrees)
+        format_string += ', resample={0}'.format(self.resample)
+        format_string += ', expand={0}'.format(self.expand)
+        if self.center is not None:
+            format_string += ', center={0}'.format(self.center)
+        format_string += ')'
+	return format_string
