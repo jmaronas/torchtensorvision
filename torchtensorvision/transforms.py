@@ -47,6 +47,9 @@ class RandomHorizontalFlip(object):
 			seed_flag=True
 
 	def __call__(self,img):
+		if not img.is_cuda:
+			self.aux=self.aux.cpu()
+			
 		assert self.shape==img.shape[-1]
 		if random.random()<0.5:
 			img = F.hflip(img,self.aux)
